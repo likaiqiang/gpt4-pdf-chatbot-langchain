@@ -12,14 +12,17 @@
     "type-check": "tsc --noEmit",
     "lint": "eslint --ignore-path .gitignore \"**/*.+(ts|js|tsx)\"",
     "format": "prettier --ignore-path .gitignore \"**/*.+(ts|js|tsx)\" --write",
-    "ingest": "tsx -r dotenv/config scripts/ingest-data.ts"
+    "ingest": "tsx -r dotenv/config scripts/ingest-data.ts",
+    "debug": "node --inspect-brk ./node_modules/next/dist/bin/next dev"
   },
   "dependencies": {
+    "@dqbd/tiktoken": "^1.0.7",
     "@microsoft/fetch-event-source": "^2.0.1",
     "@pinecone-database/pinecone": "0.0.14",
     "@radix-ui/react-accordion": "^1.1.1",
     "clsx": "^1.2.1",
     "dotenv": "^16.0.3",
+    "gpt3-tokenizer": "^1.1.5",
     "langchain": "0.0.82",
     "lucide-react": "^0.125.0",
     "next": "13.2.3",
@@ -27,7 +30,8 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-markdown": "^8.0.5",
-    "tailwind-merge": "^1.10.0"
+    "tailwind-merge": "^1.10.0",
+    "ts-node": "^10.9.1"
   },
   "devDependencies": {
     "@types/node": "^18.14.6",
