@@ -42,8 +42,7 @@ function get_sliced_message(messages: MessageItem[],model:supportModelType){
         const {content} = message
         const tokens = encoding.encode(content as string)
         if(tokens.length > getModelContextSize(model)){
-            // const slicedTokens = tokens.slice(0,getModelContextSize(model))
-            const slicedTokens = tokens.slice(0,2)
+            const slicedTokens = tokens.slice(0,getModelContextSize(model))
             const slicedValue = decoder.decode(encoding.decode(slicedTokens))
             return {
                 ...message,
@@ -115,11 +114,6 @@ const num_tokens_from_messages = (messages: MessageItem[],model:supportModelType
         num_tokens += tokens_per_message
 
         for (const [key, value] of Object.entries(message)) {
-            // const tokens = encoding.encode(value as string)
-            // if(tokens.length > getModelContextSize(model)){
-            //     const slicedTokens = tokens.slice(0,getModelContextSize(model))
-            //     const slicedValue = ''
-            // }
             num_tokens += encoding.encode(value as string).length
             if (key === 'name') { num_tokens += tokens_per_name }
         }
