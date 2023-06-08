@@ -1,9 +1,17 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
-import { PineconeStore } from 'langchain/vectorstores/pinecone';
 import { makeChain } from '@/utils/makechain';
-import { pinecone } from '@/utils/pinecone-client';
-import { PINECONE_INDEX_NAME, PINECONE_NAME_SPACE } from '@/config/pinecone';
+import {FaissStore} from "langchain/vectorstores/faiss";
+import path from 'path'
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+/* Name of directory to retrieve your files from
+   Make sure to add your PDF files inside the 'docs' folder
+*/
+const filePath = path.join(__dirname,'../../docs');
 
 export default async function handler(
   req: NextApiRequest,
@@ -26,20 +34,15 @@ export default async function handler(
   const sanitizedQuestion = question.trim().replaceAll('\n', ' ');
 
   try {
-    const index = pinecone.Index(PINECONE_INDEX_NAME);
 
     /* create vectorstore*/
-    const vectorStore = await PineconeStore.fromExistingIndex(
-      new OpenAIEmbeddings({}),
-      {
-        pineconeIndex: index,
-        textKey: 'text',
-        namespace: PINECONE_NAME_SPACE, //namespace comes from your config folder
-      },
+    const loadedVectorStore = await FaissStore.load(
+        `${filePath}/index2`,
+        new OpenAIEmbeddings()
     );
 
     //create chain
-    const chain = makeChain(vectorStore);
+    const chain = makeChain(loadedVectorStore);
     //Ask a question using chat history
     const response = await chain.call({
       question: sanitizedQuestion,

@@ -1,15 +1,31 @@
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
-import { PineconeStore } from 'langchain/vectorstores/pinecone';
-import { pinecone } from '@/utils/pinecone-client';
 import { PDFLoader } from 'langchain/document_loaders/fs/pdf';
-import { PINECONE_INDEX_NAME, PINECONE_NAME_SPACE } from '@/config/pinecone';
 import { DirectoryLoader } from 'langchain/document_loaders/fs/directory';
+import { FaissStore } from "langchain/vectorstores/faiss";
+import { HttpsProxyAgent } from 'https-proxy-agent';
+import path from 'path'
+import { fileURLToPath } from 'url';
+import {Document} from "langchain/document";
 
-/* Name of directory to retrieve your files from 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+/* Name of directory to retrieve your files from
    Make sure to add your PDF files inside the 'docs' folder
 */
-const filePath = 'docs';
+const filePath = path.join(__dirname,'../docs');
+
+function makeDocuments(documents: Document[]){
+  return documents.map(document=>{
+    const {metadata,pageContent} = document
+    return new Document({
+      metadata,
+      pageContent: pageContent.replace(/\n/g,'')
+    })
+  })
+}
+
 
 export const run = async () => {
   try {
@@ -27,20 +43,24 @@ export const run = async () => {
       chunkOverlap: 200,
     });
 
-    const docs = await textSplitter.splitDocuments(rawDocs);
+    const docs = makeDocuments(
+        await textSplitter.splitDocuments(rawDocs)
+    )
     console.log('split docs', docs);
 
     console.log('creating vector store...');
-    /*create and store the embeddings in the vectorStore*/
-    const embeddings = new OpenAIEmbeddings();
-    const index = pinecone.Index(PINECONE_INDEX_NAME); //change to your own index name
 
-    //embed the PDF documents
-    await PineconeStore.fromDocuments(docs, embeddings, {
-      pineconeIndex: index,
-      namespace: PINECONE_NAME_SPACE,
-      textKey: 'text',
-    });
+    const vectorStore = await FaissStore.fromDocuments(docs,new OpenAIEmbeddings({},{
+      baseOptions:{
+        proxy: false,
+        httpAgent: new HttpsProxyAgent('http://127.0.0.1:7890'),
+        httpsAgent: new HttpsProxyAgent('http://127.0.0.1:7890')
+      }
+    }))
+    // await vectorStore.addDocuments(docs);
+
+    await vectorStore.save(`${filePath}/index2`);
+
   } catch (error) {
     console.log('error', error);
     throw new Error('Failed to ingest your data');
