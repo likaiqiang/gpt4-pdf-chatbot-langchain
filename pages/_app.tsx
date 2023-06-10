@@ -1,6 +1,8 @@
 import '@/styles/base.css';
 import type { AppProps } from 'next/app';
 import { Inter } from 'next/font/google';
+import NoSSR from 'react-no-ssr';
+
 
 const inter = Inter({
   variable: '--font-inter',
@@ -11,7 +13,9 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <main className={inter.variable}>
-        <Component {...pageProps} />
+          <NoSSR>
+              <Component {...pageProps} />
+          </NoSSR>
       </main>
     </>
   );

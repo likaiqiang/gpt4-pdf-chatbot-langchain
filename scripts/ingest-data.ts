@@ -4,17 +4,9 @@ import { PDFLoader } from 'langchain/document_loaders/fs/pdf';
 import { DirectoryLoader } from 'langchain/document_loaders/fs/directory';
 import { FaissStore } from "langchain/vectorstores/faiss";
 import { HttpsProxyAgent } from 'https-proxy-agent';
-import path from 'path'
-import { fileURLToPath } from 'url';
 import {Document} from "langchain/document";
+import {filePath} from '@/utils/file'
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-/* Name of directory to retrieve your files from
-   Make sure to add your PDF files inside the 'docs' folder
-*/
-const filePath = path.join(__dirname,'../docs');
 
 function makeDocuments(documents: Document[]){
   return documents.map(document=>{

@@ -3,30 +3,29 @@ import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 import { makeChain } from '@/utils/makechain';
 import {FaissStore} from "langchain/vectorstores/faiss";
 import path from 'path'
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import {filePath} from '@/utils/file'
+import {HttpsProxyAgent} from "https-proxy-agent";
 
 /* Name of directory to retrieve your files from
    Make sure to add your PDF files inside the 'docs' folder
 */
-const filePath = path.join(__dirname,'../../docs');
 
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse,
 ) {
-  const { question, history } = req.body;
+  const { question, history, resource_name} = req.body;
 
   console.log('question', question);
+  console.log('resource_name', resource_name);
 
   //only accept post requests
   if (req.method !== 'POST') {
-    res.status(405).json({ error: 'Method not allowed' });
-    return;
+    return res.status(405).json({ error: 'Method not allowed' });
   }
-
+  if(!resource_name){
+    return res.status(400).json({ message: 'No resource_name in the request' });
+  }
   if (!question) {
     return res.status(400).json({ message: 'No question in the request' });
   }
@@ -37,8 +36,14 @@ export default async function handler(
 
     /* create vectorstore*/
     const loadedVectorStore = await FaissStore.load(
-        `${filePath}/index2`,
-        new OpenAIEmbeddings()
+        `${filePath}${path.sep}${resource_name}`,
+        new OpenAIEmbeddings({},{
+          baseOptions:{
+            proxy: false,
+            httpAgent: new HttpsProxyAgent('http://127.0.0.1:7890'),
+            httpsAgent: new HttpsProxyAgent('http://127.0.0.1:7890')
+          }
+        })
     );
 
     //create chain
