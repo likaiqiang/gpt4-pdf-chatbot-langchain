@@ -1,13 +1,13 @@
 import type {NextApiRequest, NextApiResponse} from 'next';
 import path from 'path'
 import fs from 'fs'
-import {filePath} from '@/utils/file'
+import {outputFilePath} from '@/utils/file'
 
 /* Name of directory to retrieve your files from
    Make sure to add your PDF files inside the 'docs' folder
 */
 
-export function findSubfoldersWithFiles(rootFolder:string = filePath) {
+export function findSubfoldersWithFiles(rootFolder:string = outputFilePath) {
     const subfolders = fs.readdirSync(rootFolder, { withFileTypes: true })
         .filter(dirent => dirent.isDirectory())
         .map(dirent => dirent.name);
@@ -27,7 +27,7 @@ export default async function handler(
         return res.status(405).json({ error: 'Method not allowed' });
     }
     try {
-        const matchingSubfolders = findSubfoldersWithFiles(filePath);
+        const matchingSubfolders = findSubfoldersWithFiles();
 
         console.log('response', matchingSubfolders);
         res.status(200).json(matchingSubfolders);

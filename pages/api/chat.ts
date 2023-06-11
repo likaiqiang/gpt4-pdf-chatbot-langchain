@@ -3,7 +3,7 @@ import { OpenAIEmbeddings } from 'langchain/embeddings/openai';
 import { makeChain } from '@/utils/makechain';
 import {FaissStore} from "langchain/vectorstores/faiss";
 import path from 'path'
-import {filePath} from '@/utils/file'
+import {filePath,outputFilePath} from '@/utils/file'
 import {HttpsProxyAgent} from "https-proxy-agent";
 
 /* Name of directory to retrieve your files from
@@ -36,7 +36,7 @@ export default async function handler(
 
     /* create vectorstore*/
     const loadedVectorStore = await FaissStore.load(
-        `${filePath}${path.sep}${resource_name}`,
+        `${outputFilePath}${path.sep}${resource_name}`,
         new OpenAIEmbeddings({},{
           baseOptions:{
             proxy: false,
