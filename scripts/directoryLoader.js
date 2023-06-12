@@ -1,4 +1,4 @@
-import {DirectoryLoader} from "langchain/document_loaders/fs/directory";
+import {DirectoryLoader, UnknownHandling} from "langchain/document_loaders/fs/directory";
 
 export default class CustomDirectoryLoader extends DirectoryLoader{
     async load() {

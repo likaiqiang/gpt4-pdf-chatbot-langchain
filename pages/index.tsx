@@ -45,7 +45,7 @@ export default function Home(props:Props) {
 
   const [cache,setCache] = useLocalStorage('chat-cache',{})
   const cacheRef = useLatest(cache)
-  const curResourceName = resources.list[resources.activeIndex]
+  const curResourceName = resources.list[activeIndex]
 
 
   const messageListRef = useRef<HTMLDivElement>(null);
@@ -71,7 +71,7 @@ export default function Home(props:Props) {
 
   useEffect(() => {
     textAreaRef.current?.focus();
-    const name = resources.list[resources.activeIndex]
+    const name = resources.list[activeIndex]
     initCacheByName(name)
   }, [resources]);
 
@@ -110,7 +110,7 @@ export default function Home(props:Props) {
         body: JSON.stringify({
           question,
           history,
-          resource_name: resources.list[resources.activeIndex]
+          resource_name: resources.list[activeIndex]
         }),
       });
       const data = await response.json();
@@ -153,7 +153,7 @@ export default function Home(props:Props) {
   })
 
   const onTabClick = useMemoizedFn((index)=>{
-    const name = resources.list[resources.activeIndex]
+    const name = resources.list[index]
     initCacheByName(name)
     setActive(index)
   })
@@ -177,7 +177,7 @@ export default function Home(props:Props) {
                           onTabClick(index)
                         }}>
                           <a
-                             className={["inline-block", "p-4", "border-b-2", "rounded-t-lg", "hover:text-gray-600", "hover:border-gray-300", "dark:hover:text-gray-300", activeIndex  === index ? 'border-blue-600' :''].join(' ')}>
+                             className={["inline-block", "p-4", "border-b-2", "rounded-t-lg", "hover:text-gray-600", "dark:hover:text-gray-300", activeIndex  === index ? 'border-blue-600' :''].join(' ')}>
                             {item}
                           </a>
                         </li>
