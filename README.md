@@ -94,3 +94,6 @@ Frontend of this repo is inspired by [langchain-chat-nextjs](https://github.com/
 
 ## Question
 https://github.com/hwchase17/langchainjs/issues/1454
+
+## Warning
+The pdf must have selectable text, if your pdf is a scanned file, please process it by ocr.
